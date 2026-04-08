@@ -11,7 +11,8 @@ import time
 from pathlib import Path
 from typing import Optional, List
 from fastapi import FastAPI, HTTPException, Query
-from fastapi.responses import JSONResponse, Response
+from fastapi.responses import JSONResponse
+from fastapi.openapi.docs import get_redoc_html, get_swagger_ui_html
 from pydantic import BaseModel
 
 app = FastAPI(
@@ -47,7 +48,8 @@ SPEAKERS = {
 
 
 def load_cookie() -> str:
-    cookie_file = Path(__file__).parent.parent.parent / ".cookie"
+    base_dir = Path(__file__).parent.parent.parent
+    cookie_file = base_dir / ".cookie"
     if cookie_file.exists():
         return cookie_file.read_text().strip()
     return ""
@@ -162,20 +164,39 @@ class TTSResponse(BaseModel):
 
 @app.get("/api/")
 async def index():
+    cookie = load_cookie()
     return {
         "message": "豆包 TTS API",
         "version": "1.0.0",
+        "cookie_loaded": bool(cookie),
         "endpoints": {
             "POST /api/tts": "文本转语音",
             "GET /api/speakers": "获取可用语音列表",
-            "GET /api/health": "健康检查"
+            "GET /api/health": "健康检查",
+            "GET /api/docs": "Swagger 文档",
+            "GET /api/redoc": "ReDoc 文档"
         }
     }
 
 
 @app.get("/api/health")
 async def health():
-    return {"status": "healthy", "timestamp": time.time()}
+    cookie = load_cookie()
+    return {
+        "status": "healthy",
+        "timestamp": time.time(),
+        "cookie_configured": bool(cookie)
+    }
+
+
+@app.get("/api/docs")
+async def docs():
+    return get_swagger_ui_html(openapi_url="/api/openapi.json", title="API Docs")
+
+
+@app.get("/api/redoc")
+async def redoc():
+    return get_redoc_html(openapi_url="/api/openapi.json", title="API Docs")
 
 
 @app.get("/api/speakers")
