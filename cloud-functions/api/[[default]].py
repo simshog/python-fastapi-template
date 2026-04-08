@@ -162,7 +162,7 @@ class TTSResponse(BaseModel):
     duration: float
 
 
-@app.get("/api/")
+@app.get("/")
 async def index():
     cookie = load_cookie()
     return {
@@ -170,16 +170,16 @@ async def index():
         "version": "1.0.0",
         "cookie_loaded": bool(cookie),
         "endpoints": {
-            "POST /api/tts": "文本转语音",
-            "GET /api/speakers": "获取可用语音列表",
-            "GET /api/health": "健康检查",
-            "GET /api/docs": "Swagger 文档",
-            "GET /api/redoc": "ReDoc 文档"
+            "POST /tts": "文本转语音",
+            "GET /speakers": "获取可用语音列表",
+            "GET /health": "健康检查",
+            "GET /docs": "Swagger 文档",
+            "GET /redoc": "ReDoc 文档"
         }
     }
 
 
-@app.get("/api/health")
+@app.get("/health")
 async def health():
     cookie = load_cookie()
     return {
@@ -189,22 +189,22 @@ async def health():
     }
 
 
-@app.get("/api/docs")
+@app.get("/docs")
 async def docs():
-    return get_swagger_ui_html(openapi_url="/api/openapi.json", title="API Docs")
+    return get_swagger_ui_html(openapi_url="/openapi.json", title="API Docs")
 
 
-@app.get("/api/redoc")
+@app.get("/redoc")
 async def redoc():
-    return get_redoc_html(openapi_url="/api/openapi.json", title="API Docs")
+    return get_redoc_html(openapi_url="/openapi.json", title="API Docs")
 
 
-@app.get("/api/speakers")
+@app.get("/speakers")
 async def get_speakers():
     return {"speakers": SPEAKERS}
 
 
-@app.post("/api/tts", response_model=TTSResponse)
+@app.post("/tts", response_model=TTSResponse)
 async def tts_synthesize(request: TTSRequest):
     if not request.text or len(request.text.strip()) == 0:
         raise HTTPException(status_code=400, detail="Text cannot be empty")
@@ -249,7 +249,7 @@ async def tts_synthesize(request: TTSRequest):
         )
 
 
-@app.get("/api/tts")
+@app.get("/tts")
 async def tts_get(
     text: str = Query(..., description="要转换的文本"),
     speaker: str = Query("taozi", description="语音角色"),
