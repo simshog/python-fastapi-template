@@ -11,7 +11,7 @@ import time
 from pathlib import Path
 from typing import Optional, List
 from fastapi import FastAPI, HTTPException, Query
-from fastapi.responses import JSONResponse
+from fastapi.responses import JSONResponse, Response
 from fastapi.openapi.docs import get_redoc_html, get_swagger_ui_html
 from pydantic import BaseModel
 
@@ -23,7 +23,7 @@ app = FastAPI(
 
 
 class TTSConfig:
-    speaker: str = "zh_female_taozi_conversation_v4_wvae_bigtts"
+    speaker: str = "zh_female_wenroutaozi_uranus_bigtts"
     format: str = "aac"
     speech_rate: float = 0
     pitch: float = 0
@@ -35,15 +35,34 @@ class TTSConfig:
 
 
 SPEAKERS = {
-    "taozi": "zh_female_taozi_conversation_v4_wvae_bigtts",
-    "shuangkuai": "zh_female_shuangkuai_emo_v3_wvae_bigtts",
-    "tianmei": "zh_female_tianmei_conversation_v4_wvae_bigtts",
-    "qingche": "zh_female_qingche_moon_bigtts",
-    "yangguang": "zh_male_yangguang_conversation_v4_wvae_bigtts",
-    "chenwen": "zh_male_chenwen_moon_bigtts",
-    "rap": "zh_male_rap_mars_bigtts",
-    "en_female": "en_female_sarah_conversation_bigtts",
-    "en_male": "en_male_adam_conversation_bigtts",
+    "温柔桃子（升级版）": "zh_female_wenroutaozi_uranus_bigtts",
+    "磁性俊宇（升级版）": "zh_male_nuanxinshizhe_mars_bigtts",
+    "阳光甜妹（升级版）": "zh_female_xiaohe_conversation_wvae_bigtts",
+    "温柔桃子（经典版）": "zh_female_wenroutaozi_v2_mars_bigtts",
+    "邻家女孩": "zh_female_f261_conversation_wvae_bigtts",
+    "魅力苏菲": "zh_female_sophie_conversation_wvae_bigtts",
+    "撒娇学妹": "zh_female_yuanqinvyou_wvae_bigtts",
+    "邻家男孩": "zh_male_linjiananhai_moon_bigtts",
+    "悠悠君子": "zh_male_M100_conversation_wvae_bigtts",
+    "温暖阿虎": "zh_male_ahu_conversation_wvae_bigtts",
+    "少年梓辛": "zh_male_m286_conversation_wvae_bigtts",
+    "阳光阿辰": "zh_male_qingyiyuxuan_mars_bigtts",
+    "腹黑霸总": "ICL_c021bc19bf92",
+    "冷酷霸总": "ICL_e0b9b93ee322",
+    "傲娇霸总": "zh_male_aojiaobazong_wvae_bigtts",
+    "霸道总裁": "ICL_d4d40acd33dd",
+    "温柔子言": "zh_male_cheng_mars_bigtts",
+    "率性阿哲": "zh_male_litiebanzi_mars_bigtts",
+    "温柔陆辰": "ICL_df4fc4d1ce4b",
+    "甜美小雪": "ICL_6acf86286e24",
+    "清冷阿梦": "ICL_16cd9a58768e",
+    "东方浩然": "zh_male_dongfanghaoran_moon_bigtts",
+    "病娇少爷": "ICL_72afa6c5dc07",
+    "清爽男大": "zh_male_junlangxize_mars_bigtts",
+    "清朗宇澄": "ICL_9b3bc6941076",
+    "奶音俊少": "ICL_932b3f52bf3d",
+    "沉稳皓轩": "ICL_5a413fbc14fc",
+    "温柔俊彦": "ICL_0ce6ef379e73",
 }
 
 
@@ -143,7 +162,7 @@ class DoubaoTTS:
 
 class TTSRequest(BaseModel):
     text: str
-    speaker: Optional[str] = "taozi"
+    speaker: Optional[str] = "zh_female_wenroutaozi_uranus_bigtts"
     speed: Optional[float] = 0
     pitch: Optional[float] = 0
     format: Optional[str] = "aac"
@@ -213,7 +232,7 @@ async def tts_synthesize(request: TTSRequest):
         raise HTTPException(status_code=500, detail="Cookie not configured")
     
     config = TTSConfig()
-    config.speaker = SPEAKERS.get(request.speaker, request.speaker)
+    config.speaker = request.speaker
     config.speech_rate = request.speed
     config.pitch = request.pitch
     config.format = request.format
@@ -248,10 +267,10 @@ async def tts_synthesize(request: TTSRequest):
 @app.get("/tts")
 async def tts_get(
     text: str = Query(..., description="要转换的文本"),
-    speaker: str = Query("taozi", description="语音角色"),
+    speaker: str = Query("zh_female_wenroutaozi_uranus_bigtts", description="语音角色"),
     speed: float = Query(0, description="语速 -1.0 ~ 1.0"),
     pitch: float = Query(0, description="音调 -1.0 ~ 1.0"),
-    format: str = Query("aac", description="音频格式"),
+    format: str = Query("aac", description="音频格式 aac/mp3"),
 ):
     request = TTSRequest(
         text=text,
@@ -261,3 +280,56 @@ async def tts_get(
         format=format
     )
     return await tts_synthesize(request)
+
+
+@app.post("/audio")
+async def tts_audio(request: TTSRequest):
+    if not request.text or len(request.text.strip()) == 0:
+        raise HTTPException(status_code=400, detail="Text cannot be empty")
+    
+    if len(request.text) > 5000:
+        raise HTTPException(status_code=400, detail="Text too long (max 5000 characters)")
+    
+    cookie = load_cookie()
+    if not cookie:
+        raise HTTPException(status_code=500, detail="Cookie not configured")
+    
+    config = TTSConfig()
+    config.speaker = request.speaker
+    config.speech_rate = request.speed
+    config.pitch = request.pitch
+    config.format = request.format
+    config.language = request.language
+    config.cookie = cookie
+    
+    tts = DoubaoTTS(config)
+    result = await tts.synthesize(request.text)
+    
+    if result["success"]:
+        ext = request.format if request.format else "aac"
+        content_type = "audio/aac" if ext == "aac" else "audio/mp3"
+        return Response(
+            content=result["audio_data"],
+            media_type=content_type,
+            headers={"Content-Disposition": f"attachment; filename=tts_{int(time.time())}.{ext}"}
+        )
+    else:
+        raise HTTPException(status_code=500, detail=result["error"])
+
+
+@app.get("/audio")
+async def tts_audio_get(
+    text: str = Query(..., description="要转换的文本"),
+    speaker: str = Query("zh_female_wenroutaozi_uranus_bigtts", description="语音角色"),
+    speed: float = Query(0, description="语速 -1.0 ~ 1.0"),
+    pitch: float = Query(0, description="音调 -1.0 ~ 1.0"),
+    format: str = Query("aac", description="音频格式 aac/mp3"),
+):
+    request = TTSRequest(
+        text=text,
+        speaker=speaker,
+        speed=speed,
+        pitch=pitch,
+        format=format
+    )
+    return await tts_audio(request)

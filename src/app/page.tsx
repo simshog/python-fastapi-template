@@ -12,20 +12,39 @@ interface Speaker {
 }
 
 const speakers: Speaker[] = [
-  { id: "taozi", name: "桃子", desc: "女声 · 对话" },
-  { id: "shuangkuai", name: "爽快", desc: "女声 · 活泼" },
-  { id: "tianmei", name: "甜美", desc: "女声 · 温柔" },
-  { id: "qingche", name: "清澈", desc: "女声 · 清亮" },
-  { id: "yangguang", name: "阳光", desc: "男声 · 温暖" },
-  { id: "chenwen", name: "沉稳", desc: "男声 · 成熟" },
-  { id: "rap", name: "说唱", desc: "男声 · 节奏" },
-  { id: "en_female", name: "Sarah", desc: "英文 · 女声" },
-  { id: "en_male", name: "Adam", desc: "英文 · 男声" },
+  { id: "zh_female_wenroutaozi_uranus_bigtts", name: "温柔桃子（升级版）", desc: "女声" },
+  { id: "zh_male_nuanxinshizhe_mars_bigtts", name: "磁性俊宇（升级版）", desc: "男声" },
+  { id: "zh_female_xiaohe_conversation_wvae_bigtts", name: "阳光甜妹（升级版）", desc: "女声" },
+  { id: "zh_female_wenroutaozi_v2_mars_bigtts", name: "温柔桃子（经典版）", desc: "女声" },
+  { id: "zh_female_f261_conversation_wvae_bigtts", name: "邻家女孩", desc: "女声" },
+  { id: "zh_female_sophie_conversation_wvae_bigtts", name: "魅力苏菲", desc: "女声" },
+  { id: "zh_female_yuanqinvyou_wvae_bigtts", name: "撒娇学妹", desc: "女声" },
+  { id: "zh_male_linjiananhai_moon_bigtts", name: "邻家男孩", desc: "男声" },
+  { id: "zh_male_M100_conversation_wvae_bigtts", name: "悠悠君子", desc: "男声" },
+  { id: "zh_male_ahu_conversation_wvae_bigtts", name: "温暖阿虎", desc: "男声" },
+  { id: "zh_male_m286_conversation_wvae_bigtts", name: "少年梓辛", desc: "男声" },
+  { id: "zh_male_qingyiyuxuan_mars_bigtts", name: "阳光阿辰", desc: "男声" },
+  { id: "ICL_c021bc19bf92", name: "腹黑霸总", desc: "男声" },
+  { id: "ICL_e0b9b93ee322", name: "冷酷霸总", desc: "男声" },
+  { id: "zh_male_aojiaobazong_wvae_bigtts", name: "傲娇霸总", desc: "男声" },
+  { id: "ICL_d4d40acd33dd", name: "霸道总裁", desc: "男声" },
+  { id: "zh_male_cheng_mars_bigtts", name: "温柔子言", desc: "男声" },
+  { id: "zh_male_litiebanzi_mars_bigtts", name: "率性阿哲", desc: "男声" },
+  { id: "ICL_df4fc4d1ce4b", name: "温柔陆辰", desc: "男声" },
+  { id: "ICL_6acf86286e24", name: "甜美小雪", desc: "女声" },
+  { id: "ICL_16cd9a58768e", name: "清冷阿梦", desc: "女声" },
+  { id: "zh_male_dongfanghaoran_moon_bigtts", name: "东方浩然", desc: "男声" },
+  { id: "ICL_72afa6c5dc07", name: "病娇少爷", desc: "男声" },
+  { id: "zh_male_junlangxize_mars_bigtts", name: "清爽男大", desc: "男声" },
+  { id: "ICL_9b3bc6941076", name: "清朗宇澄", desc: "男声" },
+  { id: "ICL_932b3f52bf3d", name: "奶音俊少", desc: "男声" },
+  { id: "ICL_5a413fbc14fc", name: "沉稳皓轩", desc: "男声" },
+  { id: "ICL_0ce6ef379e73", name: "温柔俊彦", desc: "男声" },
 ]
 
 export default function Home() {
   const [text, setText] = useState("")
-  const [speaker, setSpeaker] = useState("taozi")
+  const [speaker, setSpeaker] = useState("zh_female_wenroutaozi_uranus_bigtts")
   const [speed, setSpeed] = useState(0)
   const [pitch, setPitch] = useState(0)
   const [isGenerating, setIsGenerating] = useState(false)
