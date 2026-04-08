@@ -48,11 +48,7 @@ SPEAKERS = {
 
 
 def load_cookie() -> str:
-    base_dir = Path(__file__).parent.parent.parent
-    cookie_file = base_dir / ".cookie"
-    if cookie_file.exists():
-        return cookie_file.read_text().strip()
-    return ""
+    return "sessionid=1554223746fcbbaffa9e672a19002bcd; sid_guard=1554223746fcbbaffa9e672a19002bcd%7C1775665945%7C2592000%7CFri%2C+08-May-2026+16%3A32%3A25+GMT; uid_tt=0722f0c41cb3535cbce42b3565b973dd"
 
 
 class DoubaoTTS:
