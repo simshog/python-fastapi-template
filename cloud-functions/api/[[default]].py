@@ -160,30 +160,30 @@ class TTSResponse(BaseModel):
     duration: float
 
 
-@app.get("/")
+@app.get("/api/")
 async def index():
     return {
         "message": "豆包 TTS API",
         "version": "1.0.0",
         "endpoints": {
-            "POST /tts": "文本转语音",
-            "GET /speakers": "获取可用语音列表",
-            "GET /health": "健康检查"
+            "POST /api/tts": "文本转语音",
+            "GET /api/speakers": "获取可用语音列表",
+            "GET /api/health": "健康检查"
         }
     }
 
 
-@app.get("/health")
+@app.get("/api/health")
 async def health():
     return {"status": "healthy", "timestamp": time.time()}
 
 
-@app.get("/speakers")
+@app.get("/api/speakers")
 async def get_speakers():
     return {"speakers": SPEAKERS}
 
 
-@app.post("/tts", response_model=TTSResponse)
+@app.post("/api/tts", response_model=TTSResponse)
 async def tts_synthesize(request: TTSRequest):
     if not request.text or len(request.text.strip()) == 0:
         raise HTTPException(status_code=400, detail="Text cannot be empty")
@@ -228,7 +228,7 @@ async def tts_synthesize(request: TTSRequest):
         )
 
 
-@app.get("/tts")
+@app.get("/api/tts")
 async def tts_get(
     text: str = Query(..., description="要转换的文本"),
     speaker: str = Query("taozi", description="语音角色"),
